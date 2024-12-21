@@ -196,3 +196,41 @@ test_df = pd.merge(test_df, test_series, how="left", on='id')
 # Loại bỏ cột 'id' khỏi dữ liệu
 train_df = train_df.drop('id', axis=1)
 test_df = test_df.drop('id', axis=1)
+# Xác định các cột đặc trưng và xử lý các cột chuỗi thời gian
+feature_columns = ['Basic_Demos-Enroll_Season', 'Basic_Demos-Age', 'Basic_Demos-Sex',
+                   'CGAS-Season', 'CGAS-CGAS_Score', 'Physical-Season', 'Physical-BMI',
+                   'Physical-Height', 'Physical-Weight', 'Physical-Waist_Circumference',
+                   'Physical-Diastolic_BP', 'Physical-HeartRate', 'Physical-Systolic_BP',
+                   'Fitness_Endurance-Season', 'Fitness_Endurance-Max_Stage',
+                   'Fitness_Endurance-Time_Mins', 'Fitness_Endurance-Time_Sec',
+                   'FGC-Season', 'FGC-FGC_CU', 'FGC-FGC_CU_Zone', 'FGC-FGC_GSND',
+                   'FGC-FGC_GSND_Zone', 'FGC-FGC_GSD', 'FGC-FGC_GSD_Zone', 'FGC-FGC_PU',
+                   'FGC-FGC_PU_Zone', 'FGC-FGC_SRL', 'FGC-FGC_SRL_Zone', 'FGC-FGC_SRR',
+                   'FGC-FGC_SRR_Zone', 'FGC-FGC_TL', 'FGC-FGC_TL_Zone', 'BIA-Season',
+                   'BIA-BIA_Activity_Level_num', 'BIA-BIA_BMC', 'BIA-BIA_BMI',
+                   'BIA-BIA_BMR', 'BIA-BIA_DEE', 'BIA-BIA_ECW', 'BIA-BIA_FFM',
+                   'BIA-BIA_FFMI', 'BIA-BIA_FMI', 'BIA-BIA_Fat', 'BIA-BIA_Frame_num',
+                   'BIA-BIA_ICW', 'BIA-BIA_LDM', 'BIA-BIA_LST', 'BIA-BIA_SMM',
+                   'BIA-BIA_TBW', 'PAQ_A-Season', 'PAQ_A-PAQ_A_Total', 'PAQ_C-Season',
+                   'PAQ_C-PAQ_C_Total', 'SDS-Season', 'SDS-SDS_Total_Raw',
+                   'SDS-SDS_Total_T', 'PreInt_EduHx-Season',
+                   'PreInt_EduHx-computerinternet_hoursday']
+
+feature_columns += series_cols
+sii_target = train_df.sii
+train_df = train_df.drop('sii', axis=1, inplace=False)
+train_df = train_df[feature_columns]
+
+# Xác định các cột phân loại
+categorical_columns = ['Basic_Demos-Enroll_Season', 'CGAS-Season', 'Physical-Season', 'Fitness_Endurance-Season', 
+                       'FGC-Season', 'BIA-Season', 'PAQ_A-Season', 'PAQ_C-Season', 'SDS-Season', 'PreInt_EduHx-Season']
+
+def preprocess_categorical(data):
+    # Xử lý giá trị bị thiếu và chuyển đổi kiểu dữ liệu sang 'category'
+    for column in categorical_columns: 
+        data[column] = data[column].fillna('Missing')
+        data[column] = data[column].astype('category')
+    return data
+        
+train_df = preprocess_categorical(train_df)
+test_df = preprocess_categorical(test_df)

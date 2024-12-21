@@ -234,3 +234,24 @@ def preprocess_categorical(data):
         
 train_df = preprocess_categorical(train_df)
 test_df = preprocess_categorical(test_df)
+
+def create_value_mapping(column, dataset):
+    # Tạo ánh xạ giá trị cho cột phân loại
+    unique_values = dataset[column].unique()
+    return {value: idx for idx, value in enumerate(unique_values)}
+
+for column in categorical_columns:
+    mapping_train = create_value_mapping(column, train_df)
+    mapping_test = create_value_mapping(column, test_df)
+    
+    train_df[column] = train_df[column].replace(mapping_train).astype(int)
+    test_df[column] = test_df[column].replace(mapping_test).astype(int)
+
+train_df['sii'] = sii_target
+unlabeled_data = train_df[train_df['sii'].isnull()]
+train_df = train_df.dropna(subset='sii')
+
+def calculate_weighted_kappa(estimator, X, y_actual):
+    # Tính điểm kappa có trọng số giữa giá trị thực tế và giá trị dự đoán
+    y_predicted = estimator.predict(X).astype(y_actual.dtype)
+    return cohen_kappa_score(y_actual, y_predicted, weights='quadratic')

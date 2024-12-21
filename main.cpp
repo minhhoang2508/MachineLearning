@@ -255,3 +255,26 @@ def calculate_weighted_kappa(estimator, X, y_actual):
     # Tính điểm kappa có trọng số giữa giá trị thực tế và giá trị dự đoán
     y_predicted = estimator.predict(X).astype(y_actual.dtype)
     return cohen_kappa_score(y_actual, y_predicted, weights='quadratic')
+# Hiển thị thống kê mô tả dữ liệu chuỗi thời gian
+print("Train Time Series Statistics:")
+print(train_series.head())
+
+print("\nTest Time Series Statistics:")
+print(test_series.head())
+
+# Vẽ biểu đồ phân phối của biến mục tiêu
+plt.figure(figsize=(8, 6))
+sns.countplot(x=sii_target)
+plt.title("Distribution of Target Variable (sii)")
+plt.xlabel("Sii")
+plt.ylabel("Count")
+plt.show()
+
+# Đánh giá tầm quan trọng của đặc trưng sử dụng mô hình LightGBM
+lgb_model = lgb.LGBMClassifier(random_state=42)
+lgb_model.fit(train_df.drop('sii', axis=1), train_df['sii'])
+
+# Vẽ biểu đồ tầm quan trọng của các đặc trưng
+lgb.plot_importance(lgb_model, max_num_features=20, importance_type='gain', figsize=(12, 8))
+plt.title("Top 20 Feature Importances")
+plt.show()

@@ -158,3 +158,41 @@ from xgboost import XGBRegressor
 from sklearn.ensemble import VotingRegressor
 from sklearn.model_selection import *
 from sklearn.metrics import *
+def process_file(file_name, directory_name):
+    # Đọc file Parquet, loại bỏ cột 'step' và trả về mô tả thống kê của dữ liệu
+    data = pd.read_parquet(os.path.join(directory_name, file_name, 'part-0.parquet'))
+    data.drop('step', axis=1, inplace=True)
+    return data.describe().values.reshape(-1), file_name.split('=')[1]
+
+def load_series_data(directory_name) -> pd.DataFrame:
+    # Tải và xử lý dữ liệu chuỗi thời gian từ thư mục
+    identifiers = os.listdir(directory_name)
+    
+    with ThreadPoolExecutor() as executor:
+        results = list(tqdm(executor.map(lambda file: process_file(file, directory_name), identifiers), total=len(identifiers)))
+    
+    stats, indices = zip(*results)
+    
+    dataset = pd.DataFrame(stats, columns=[f"Metric_{i}" for i in range(len(stats[0]))])
+    dataset['id'] = indices
+    
+    return dataset
+
+# Đọc dữ liệu từ các file CSV
+train_df = pd.read_csv('/kaggle/input/child-mind-institute-problematic-internet-use/train.csv')
+test_df = pd.read_csv('/kaggle/input/child-mind-institute-problematic-internet-use/test.csv')
+sample_df = pd.read_csv('/kaggle/input/child-mind-institute-problematic-internet-use/sample_submission.csv')
+
+# Tải dữ liệu chuỗi thời gian cho tập huấn luyện và tập kiểm tra
+train_series = load_series_data("/kaggle/input/child-mind-institute-problematic-internet-use/series_train.parquet")
+test_series = load_series_data("/kaggle/input/child-mind-institute-problematic-internet-use/series_test.parquet")
+series_cols = train_series.columns.tolist()
+series_cols.remove("id")
+
+# Kết hợp dữ liệu chuỗi thời gian với dữ liệu chính
+train_df = pd.merge(train_df, train_series, how="left", on='id')
+test_df = pd.merge(test_df, test_series, how="left", on='id')
+
+# Loại bỏ cột 'id' khỏi dữ liệu
+train_df = train_df.drop('id', axis=1)
+test_df = test_df.drop('id', axis=1)

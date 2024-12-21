@@ -62,3 +62,19 @@ class NeuralNetworkModel(nn.Module):
     
     def forward(self, inputs):
         return self.model(inputs)
+
+# Khởi tạo mô hình, hàm mất mát và bộ tối ưu
+mlp_model = NeuralNetworkModel(input_size=X_train_tensor.shape[1])
+loss_function = nn.CrossEntropyLoss()
+optimizer = optim.Adam(mlp_model.parameters(), lr=0.001)
+
+# Vòng lặp huấn luyện
+n_epochs = 20
+for epoch in range(n_epochs):
+    # Quá trình huấn luyện
+    mlp_model.train()
+    optimizer.zero_grad()
+    train_outputs = mlp_model(X_train_tensor)
+    train_loss = loss_function(train_outputs, y_train_tensor)
+    train_loss.backward()
+    optimizer.step()

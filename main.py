@@ -278,68 +278,24 @@ lgb_model.fit(train_df.drop('sii', axis=1), train_df['sii'])
 lgb.plot_importance(lgb_model, max_num_features=20, importance_type='gain', figsize=(12, 8))
 plt.title("Top 20 Feature Importances")
 plt.show()
-import os
-from pathlib import Path
-
 import numpy as np
 import pandas as pd
-import polars as pl
-
-from sklearn.model_selection import StratifiedGroupKFold
-from sklearn.model_selection import cross_val_score
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.metrics import roc_auc_score
-from sklearn.ensemble import VotingClassifier
-
-from imblearn.under_sampling import RandomUnderSampler
-from imblearn.pipeline import Pipeline
-from imblearn.over_sampling import RandomOverSampler
-
-import lightgbm as lgb
-import catboost as cb
-import xgboost as xgb
-
-import optuna
-from optuna.samplers import TPESampler
-
-from imblearn.under_sampling import NearMiss
-from imblearn.under_sampling import ClusterCentroids
-from imblearn.under_sampling import TomekLinks
-from imblearn.under_sampling import EditedNearestNeighbours
-from imblearn.pipeline import Pipeline as ImbPipeline
-from sklearn.impute import SimpleImputer
-
-import time
-from sklearn.feature_selection import SelectKBest, chi2, mutual_info_classif, VarianceThreshold
-import numpy as np
-import polars as pl
-import pandas as pd
-from sklearn.base import clone
-from copy import deepcopy
-import optuna
-from scipy.optimize import minimize
 import os
-import matplotlib.pyplot as plt
-import seaborn as sns
-
 import re
-from colorama import Fore, Style
-
-from tqdm import tqdm
-from IPython.display import clear_output
+from sklearn.base import clone
+from sklearn.metrics import cohen_kappa_score
+from sklearn.model_selection import StratifiedKFold
+from scipy.optimize import minimize
 from concurrent.futures import ThreadPoolExecutor
+from tqdm import tqdm
 
+from colorama import Fore, Style
+from IPython.display import clear_output
 import warnings
-warnings.filterwarnings('ignore')
-pd.options.display.max_columns = None
-
-# Tải các thư viện học máy và xử lý dữ liệu cần thiết
-import lightgbm as lgb
-from catboost import CatBoostRegressor, CatBoostClassifier
+from lightgbm import LGBMRegressor
 from xgboost import XGBRegressor
+from catboost import CatBoostRegressor
 from sklearn.ensemble import VotingRegressor
-from sklearn.model_selection import *
-from sklearn.metrics import *
 # Hàm tính hệ số Kappa có trọng số bậc hai
 def quadratic_weighted_kappa(y_true, y_pred):
     return cohen_kappa_score(y_true, y_pred, weights='quadratic')
@@ -372,3 +328,4 @@ def TrainML(model_class, test_data):
     oof_non_rounded = np.zeros(len(y), dtype=float)  # Dự đoán chưa làm tròn
     oof_rounded = np.zeros(len(y), dtype=int)        # Dự đoán đã làm tròn
     test_preds = np.zeros((len(test_data), n_splits))  # Dự đoán trên tập test
+        # Huấn luyện mô hình theo từng fold

@@ -78,3 +78,20 @@ for epoch in range(n_epochs):
     train_loss = loss_function(train_outputs, y_train_tensor)
     train_loss.backward()
     optimizer.step()
+
+# Quá trình đánh giá trên tập validation
+    mlp_model.eval()
+    with torch.no_grad():
+        val_outputs = mlp_model(X_val_tensor)
+        val_loss = loss_function(val_outputs, y_val_tensor)
+        val_predictions = torch.argmax(val_outputs, dim=1)
+        val_accuracy = accuracy_score(y_val_tensor.numpy(), val_predictions.numpy())
+
+    print(f"Epoch {epoch + 1}/{n_epochs}, Loss: {train_loss.item():.4f}, Val Loss: {val_loss.item():.4f}, Val Acc: {val_accuracy:.4f}")
+
+# Đánh giá cuối cùng trên tập validation
+mlp_model.eval()
+with torch.no_grad():
+    final_predictions = mlp_model(X_val_tensor)
+    final_predictions = torch.argmax(final_predictions, dim=1).numpy()
+print("Validation Accuracy:", accuracy_score(y_val_tensor.numpy(), final_predictions))

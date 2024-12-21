@@ -340,3 +340,35 @@ from xgboost import XGBRegressor
 from sklearn.ensemble import VotingRegressor
 from sklearn.model_selection import *
 from sklearn.metrics import *
+# Hàm tính hệ số Kappa có trọng số bậc hai
+def quadratic_weighted_kappa(y_true, y_pred):
+    return cohen_kappa_score(y_true, y_pred, weights='quadratic')
+
+# Hàm làm tròn dựa trên các ngưỡng
+def threshold_Rounder(oof_non_rounded, thresholds):
+    return np.where(oof_non_rounded < thresholds[0], 0,
+                    np.where(oof_non_rounded < thresholds[1], 1,
+                             np.where(oof_non_rounded < thresholds[2], 2, 3)))
+
+# Hàm đánh giá các dự đoán so với giá trị thực tế
+def evaluate_predictions(thresholds, y_true, oof_non_rounded):
+    rounded_p = threshold_Rounder(oof_non_rounded, thresholds)
+    return -quadratic_weighted_kappa(y_true, rounded_p)
+
+# Dữ liệu mục tiêu (cột 'sii' từ `train_df`)
+sii = train_df['sii']
+
+# Hàm huấn luyện và tạo file dự đoán
+def TrainML(model_class, test_data):
+    X = train_df.drop(['sii'], axis=1)  # Dữ liệu huấn luyện (loại bỏ cột 'sii')
+    y = train_df['sii']  # Nhãn (giá trị cần dự đoán)
+
+    # Tạo đối tượng StratifiedKFold để chia dữ liệu
+    SKF = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=seed)
+    
+    train_S = []  # Lưu điểm Kappa trên tập huấn luyện
+    test_S = []   # Lưu điểm Kappa trên tập kiểm tra
+
+    oof_non_rounded = np.zeros(len(y), dtype=float)  # Dự đoán chưa làm tròn
+    oof_rounded = np.zeros(len(y), dtype=int)        # Dự đoán đã làm tròn
+    test_preds = np.zeros((len(test_data), n_splits))  # Dự đoán trên tập test

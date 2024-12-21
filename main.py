@@ -278,3 +278,65 @@ lgb_model.fit(train_df.drop('sii', axis=1), train_df['sii'])
 lgb.plot_importance(lgb_model, max_num_features=20, importance_type='gain', figsize=(12, 8))
 plt.title("Top 20 Feature Importances")
 plt.show()
+import os
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+import polars as pl
+
+from sklearn.model_selection import StratifiedGroupKFold
+from sklearn.model_selection import cross_val_score
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.metrics import roc_auc_score
+from sklearn.ensemble import VotingClassifier
+
+from imblearn.under_sampling import RandomUnderSampler
+from imblearn.pipeline import Pipeline
+from imblearn.over_sampling import RandomOverSampler
+
+import lightgbm as lgb
+import catboost as cb
+import xgboost as xgb
+
+import optuna
+from optuna.samplers import TPESampler
+
+from imblearn.under_sampling import NearMiss
+from imblearn.under_sampling import ClusterCentroids
+from imblearn.under_sampling import TomekLinks
+from imblearn.under_sampling import EditedNearestNeighbours
+from imblearn.pipeline import Pipeline as ImbPipeline
+from sklearn.impute import SimpleImputer
+
+import time
+from sklearn.feature_selection import SelectKBest, chi2, mutual_info_classif, VarianceThreshold
+import numpy as np
+import polars as pl
+import pandas as pd
+from sklearn.base import clone
+from copy import deepcopy
+import optuna
+from scipy.optimize import minimize
+import os
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+import re
+from colorama import Fore, Style
+
+from tqdm import tqdm
+from IPython.display import clear_output
+from concurrent.futures import ThreadPoolExecutor
+
+import warnings
+warnings.filterwarnings('ignore')
+pd.options.display.max_columns = None
+
+# Tải các thư viện học máy và xử lý dữ liệu cần thiết
+import lightgbm as lgb
+from catboost import CatBoostRegressor, CatBoostClassifier
+from xgboost import XGBRegressor
+from sklearn.ensemble import VotingRegressor
+from sklearn.model_selection import *
+from sklearn.metrics import *

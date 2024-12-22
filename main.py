@@ -356,4 +356,24 @@ def TrainML(model_class, test_data):
 
     print(f"Mean Train QWK --> {np.mean(train_S):.4f}")
     print(f"Mean Validation QWK ---> {np.mean(test_S):.4f}")
-       
+       # Tối ưu ngưỡng để cải thiện điểm Kappa
+    KappaOptimizer = minimize(evaluate_predictions,
+                              x0=[0.5, 1.5, 2.5], args=(y, oof_non_rounded), 
+                              method='Nelder-Mead')
+    assert KappaOptimizer.success, "Optimization did not converge."
+    
+    oof_tuned = threshold_Rounder(oof_non_rounded, KappaOptimizer.x)
+    tKappa = quadratic_weighted_kappa(y, oof_tuned)
+
+    print(f"----> || Optimized QWK SCORE :: {Fore.CYAN}{Style.BRIGHT} {tKappa:.3f}{Style.RESET_ALL}")
+
+    tpm = test_preds.mean(axis=1)  # Trung bình các dự đoán trên tập test
+    tpTuned = threshold_Rounder(tpm, KappaOptimizer.x)
+    
+    # Tạo file nộp (submission)
+    submission = pd.DataFrame({
+        'id': sample_df['id'],
+        'sii': tpTuned
+    })
+
+    return submission

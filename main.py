@@ -419,3 +419,18 @@ CatBoost_Params = {
     'verbose': 0,
     'l2_leaf_reg': 10
 }
+# Tạo mô hình
+Light = LGBMRegressor(**Params, random_state=seed, verbose=-1, n_estimators=300)
+XGB_Model = XGBRegressor(**XGB_Params)
+CatBoost_Model = CatBoostRegressor(**CatBoost_Params)
+
+# Kết hợp mô hình
+voting_model = VotingRegressor(estimators=[
+    ('lightgbm', Light),
+    ('xgboost', XGB_Model),
+    ('catboost', CatBoost_Model)
+])
+
+# Huấn luyện và tạo file dự đoán
+Submission = TrainML(voting_model, test_df)
+Submission.to_csv('submission.csv', index=False)

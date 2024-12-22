@@ -484,3 +484,25 @@ def TrainMLWithVisualization(model_class, test_data):
         test_preds[:, fold] = model.predict(test_data)
         
         print(f"Fold {fold+1} - Train QWK: {train_kappa:.4f}, Validation QWK: {val_kappa:.4f}")
+        # Hiển thị biểu đồ kết quả QWK theo từng fold
+    plt.figure(figsize=(10, 6))
+    plt.plot(range(1, n_splits + 1), train_S, label="Train QWK", marker="o")
+    plt.plot(range(1, n_splits + 1), test_S, label="Validation QWK", marker="o")
+    plt.axhline(np.mean(test_S), color="red", linestyle="--", label="Mean Validation QWK")
+    plt.title("Quadratic Weighted Kappa (QWK) Per Fold")
+    plt.xlabel("Fold")
+    plt.ylabel("QWK Score")
+    plt.legend()
+    plt.grid()
+    plt.show()
+
+    # Tối ưu hóa điểm QWK bằng cách điều chỉnh ngưỡng
+    KappaOptimizer = minimize(evaluate_predictions,
+                               x0=[0.5, 1.5, 2.5], args=(y, oof_non_rounded), 
+                               method='Nelder-Mead')
+    assert KappaOptimizer.success, "Optimization did not converge."
+    
+    oof_tuned = threshold_Rounder(oof_non_rounded, KappaOptimizer.x)
+    tKappa = quadratic_weighted_kappa(y, oof_tuned)
+
+    print(f"----> || Optimized QWK SCORE :: {Fore.CYAN}{Style.BRIGHT} {tKappa:.3f}{Style.RESET_ALL}")

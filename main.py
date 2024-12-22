@@ -342,5 +342,18 @@ def TrainML(model_class, test_data):
         oof_non_rounded[test_idx] = y_val_pred
         y_val_pred_rounded = y_val_pred.round(0).astype(int)
         oof_rounded[test_idx] = y_val_pred_rounded
+        # Tính điểm Kappa trên tập huấn luyện và kiểm tra
+        train_kappa = quadratic_weighted_kappa(y_train, y_train_pred.round(0).astype(int))
+        val_kappa = quadratic_weighted_kappa(y_val, y_val_pred_rounded)
 
+        train_S.append(train_kappa)
+        test_S.append(val_kappa)
+        
+        test_preds[:, fold] = model.predict(test_data)  # Lưu dự đoán cho tập test
+        
+        print(f"Fold {fold+1} - Train QWK: {train_kappa:.4f}, Validation QWK: {val_kappa:.4f}")
+        clear_output(wait=True)
+
+    print(f"Mean Train QWK --> {np.mean(train_S):.4f}")
+    print(f"Mean Validation QWK ---> {np.mean(test_S):.4f}")
        

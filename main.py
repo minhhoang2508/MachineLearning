@@ -377,3 +377,45 @@ def TrainML(model_class, test_data):
     })
 
     return submission
+# Hiển thị phân phối biến mục tiêu
+print(train_df['sii'].value_counts())
+
+# Định nghĩa các tham số global
+n_splits = 5  # Số lần gập (folds) trong StratifiedKFold
+seed = 42     # Seed để tái lập kết quả
+
+# Tham số mô hình LightGBM
+Params = {
+    'learning_rate': 0.046,
+    'max_depth': 12,
+    'num_leaves': 478,
+    'min_data_in_leaf': 13,
+    'feature_fraction': 0.893,
+    'bagging_fraction': 0.784,
+    'bagging_freq': 4,
+    'lambda_l1': 10,
+    'lambda_l2': 0.01
+}
+
+# Tham số mô hình XGBoost
+XGB_Params = {
+    'learning_rate': 0.05,
+    'max_depth': 6,
+    'n_estimators': 200,
+    'subsample': 0.8,
+    'colsample_bytree': 0.8,
+    'reg_alpha': 1,
+    'reg_lambda': 5,
+    'random_state': seed,
+    'tree_method': 'exact'
+}
+
+# Tham số mô hình CatBoost
+CatBoost_Params = {
+    'learning_rate': 0.05,
+    'depth': 6,
+    'iterations': 200,
+    'random_seed': seed,
+    'verbose': 0,
+    'l2_leaf_reg': 10
+}

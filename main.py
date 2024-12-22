@@ -434,3 +434,30 @@ voting_model = VotingRegressor(estimators=[
 # Huấn luyện và tạo file dự đoán
 Submission = TrainML(voting_model, test_df)
 Submission.to_csv('submission.csv', index=False)
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+def TrainMLWithVisualization(model_class, test_data):
+    # Chuẩn bị dữ liệu huấn luyện và biến mục tiêu
+    X = train_df.drop(['sii'], axis=1)
+    y = train_df['sii']
+
+    # Hiển thị phân phối biến mục tiêu
+    plt.figure(figsize=(8, 4))
+    sns.countplot(x=y, palette="viridis")
+    plt.title("Target Distribution (sii)")
+    plt.xlabel("Target Value")
+    plt.ylabel("Count")
+    plt.show()
+
+    # Chia dữ liệu thành các tập huấn luyện và kiểm tra
+    SKF = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=seed)
+
+    # Khởi tạo các danh sách để lưu kết quả
+    train_S = []
+    test_S = []
+
+    oof_non_rounded = np.zeros(len(y), dtype=float) 
+    oof_rounded = np.zeros(len(y), dtype=int) 
+    test_preds = np.zeros((len(test_data), n_splits))

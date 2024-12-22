@@ -506,3 +506,27 @@ def TrainMLWithVisualization(model_class, test_data):
     tKappa = quadratic_weighted_kappa(y, oof_tuned)
 
     print(f"----> || Optimized QWK SCORE :: {Fore.CYAN}{Style.BRIGHT} {tKappa:.3f}{Style.RESET_ALL}")
+    # Dự đoán kết quả cho tập test và lưu file kết quả
+    tpm = test_preds.mean(axis=1)
+    tpTuned = threshold_Rounder(tpm, KappaOptimizer.x)
+    
+    submission = pd.DataFrame({
+        'id': sample_df['id'],
+        'sii': tpTuned
+    })
+
+    # Hiển thị biểu đồ so sánh phân phối dự đoán và thực tế
+    plt.figure(figsize=(8, 4))
+    sns.histplot(oof_non_rounded, bins=50, kde=True, label="Predicted")
+    sns.histplot(y, color='orange', bins=50, kde=True, label="Actual", alpha=0.5)
+    plt.title("Predicted vs Actual Distribution")
+    plt.xlabel("Value")
+    plt.ylabel("Frequency")
+    plt.legend()
+    plt.show()
+
+    return submission
+
+# Huấn luyện và lưu kết quả
+Submission = TrainMLWithVisualization(voting_model, test_df)
+Submission.to_csv('submission.csv', index=False)

@@ -329,3 +329,18 @@ def TrainML(model_class, test_data):
     oof_rounded = np.zeros(len(y), dtype=int)        # Dự đoán đã làm tròn
     test_preds = np.zeros((len(test_data), n_splits))  # Dự đoán trên tập test
         # Huấn luyện mô hình theo từng fold
+        for fold, (train_idx, test_idx) in enumerate(tqdm(SKF.split(X, y), desc="Training Folds", total=n_splits)):
+        X_train, X_val = X.iloc[train_idx], X.iloc[test_idx]
+        y_train, y_val = y.iloc[train_idx], y.iloc[test_idx]
+       
+        model = clone(model_class)  # Tạo bản sao của mô hình
+        model.fit(X_train, y_train)  # Huấn luyện mô hình
+         
+        y_train_pred = model.predict(X_train)  # Dự đoán trên tập huấn luyện
+        y_val_pred = model.predict(X_val)      # Dự đoán trên tập kiểm tra
+
+        oof_non_rounded[test_idx] = y_val_pred
+        y_val_pred_rounded = y_val_pred.round(0).astype(int)
+        oof_rounded[test_idx] = y_val_pred_rounded
+
+       

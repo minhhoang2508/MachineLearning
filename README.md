@@ -1,66 +1,73 @@
-# MachineLearning
+# Machine Learning
 
 We are KM group of the machine learning class INT3405E 56. 
 Our members:
 - Hoàng Đức Minh (22028051)
 - Trần Trọng Thịnh (22028073)
 - Nguyễn Đức Kiên (22028285)
+We are thrilled to be part of the Child Mind Institute — Problematic Internet Use competition. This project has given us a unique opportunity to address an increasingly important issue that affects millions of people worldwide – Problematic Internet Use.
 
-What the code does:
+# 1. About the contest
+In today’s digital age, the internet enriches education, communication, and entertainment. However, excessive use among young people can harm mental health, social interactions, and physical well-being. This competition focuses on predicting the Severe Internet Addiction Index (sii) to assess problematic internet use in children and adolescents.
+The Goal: The core objective of this competition is to develop a machine learning model capable of predicting SII. This index is a classification variable that categorizes individuals into four levels of severity – 0, 1, 2, and 3 – reflecting the degree of problematic internet behaviors.
 
-1.Data Handling:
--Reads data from multiple CSV and Parquet files, including training data, test data, and time-series data.
--Merges the time-series data with the main dataset based on the id column.
--Drops the id column after merging.
--Handles categorical features by filling missing values with "Missing" and converting them into numerical representations using label encoding.
--Separates the target variable sii and handles missing values in the target.
+# 2. Models of our project
+Our project leverages a combination of advanced machine learning models to predict the Severe Internet Addiction Index (SII). We utilize MLP (Multi-Layer Perceptron), LightGBM, XGBoost, and CatBoost to build a robust ensemble model. Each model contributes unique strengths, enhancing prediction accuracy and providing deeper insights into problematic internet use among children and adolescents.
 
-2.Exploratory Data Analysis (EDA):
--Displays the first few rows of the time-series data to provide a quick overview.
--Plots the distribution of the target variable sii.
--Calculates and plots the feature importance using a LightGBM model.
+# 3. Reasons to use the models
+a. Multi-Layer Perceptron (MLP)
+- Flexibility and Non-Linearity: MLP can model complex patterns and non-linear relationships between features, which is crucial for understanding the diverse factors contributing to problematic internet use.
+- Feature Interactions: MLP can automatically learn interactions between different features without manual feature engineering. This is important for datasets with multiple behavioral and demographic indicators.
+- Robustness: MLP performs well on large datasets and can generalize across various inputs, helping to improve prediction accuracy for the SII classification task.
 
-3.Model Training and Evaluation:
--Defines the quadratic_weighted_kappa function to calculate the Quadratic Weighted Kappa (QWK) evaluation metric.
--Implements threshold_Rounder and evaluate_predictions functions to round predictions based on optimized thresholds and evaluate the rounded predictions.
--Defines the TrainML function, which performs the following:
--Splits the data into training and validation sets using StratifiedKFold.
--Trains a given model (passed as model_class) on each fold.
--Predicts on the training and validation sets within each fold.
--Calculates and prints the QWK score for each fold.
--Calculates the mean training and validation QWK across all folds.
--Optimizes the thresholds for rounding predictions using scipy.optimize.minimize to maximize the QWK.
--Applies the optimized thresholds to the out-of-fold (OOF) predictions and the test set predictions.
--Calculates and prints the optimized QWK score.
--Generates a submission file with predictions on the test set.
--Implements TrainMLWithVisualization which is similar but also plots:
--Target distribution.
--QWK scores per fold.
--Predicted vs. actual distribution.
+![image](https://github.com/user-attachments/assets/8e833da2-64f2-4839-89d2-f871d17c2cf5)
 
-4.Model Definition and Ensemble:
--Defines hyperparameters for LightGBM, XGBoost, and CatBoost models.
--Creates instances of these models using the defined hyperparameters.
--Combines these models into a VotingRegressor to create an ensemble.
+b. LightGBM
+- Speed and Efficiency: LightGBM is known for its fast training speed and low memory usage, making it ideal for large datasets. It can handle high-dimensional data efficiently, which is essential for our project involving numerous features.
+- Accuracy and Interpretability: LightGBM consistently delivers high accuracy and provides feature importance metrics, allowing us to understand which factors most influence internet addiction levels.
+- Handling Imbalanced Data: LightGBM includes techniques for handling imbalanced datasets, improving model performance when certain SII classes have fewer samples.
 
-5.Execution:
--Calls TrainML and TrainMLWithVisualization with the VotingRegressor to train the ensemble model and generate predictions.
--Saves the predictions to a submission.csv file.
+c. XGBoost
+- Boosting Power: XGBoost is a powerful gradient boosting model that reduces bias and variance, improving overall prediction accuracy.
+- Handling Missing Data: XGBoost can naturally handle missing values, making it robust for real-world datasets where data completeness might be an issue.
+- Consistency and Stability: It often outperforms other models in competitions and real-world applications, making it a reliable choice for predicting SII.
 
-How it has been optimized:
+d. CatBoost
+- Categorical Data Handling: CatBoost is specifically designed to handle categorical data efficiently without extensive preprocessing, which aligns well with the mixed nature of our dataset (categorical and numerical).
+- Fast and Accurate: CatBoost delivers high accuracy while being faster to train compared to other boosting algorithms, making it a practical addition to our ensemble model.
+- Reduced Overfitting: CatBoost uses advanced regularization techniques, helping prevent overfitting even with limited data.
 
-1.Time Series Feature Engineering:
--The code extracts basic descriptive statistics (e.g., mean, standard deviation, min, max) from the time series data using pandas.DataFrame.describe().
+e. Why Use All Four Models?
+- Ensemble Power: By combining MLP, LightGBM, XGBoost, and CatBoost, we leverage the strengths of each model, increasing overall prediction performance and reducing the likelihood of model bias.
+- Comprehensive Insights: Different models excel at capturing different patterns in the data, allowing for a more comprehensive analysis of internet addiction factors.
+- Robustness: The ensemble approach provides more stable and reliable predictions, crucial for accurately identifying children and adolescents at risk of problematic internet use.
 
-2.Categorical Feature Encoding:
--Categorical features are converted to numerical representations using Label Encoding.
+![image](https://github.com/user-attachments/assets/1a94a312-a0b5-4c3a-bc37-fbe547d07a36)
 
-3.Hyperparameter Tuning:
--The code uses predefined hyperparameter sets for LightGBM, XGBoost, and CatBoost.
--Threshold Optimization: The code optimizes the thresholds used to round the continuous model predictions into discrete classes (0, 1, 2, 3) to maximize the Quadratic Weighted Kappa (QWK) score. This is done using scipy.optimize.minimize with the Nelder-Mead method.
+![image](https://github.com/user-attachments/assets/50a3a10b-ae0d-427c-8997-55d57d935be5)
 
-4.Ensemble Modeling:
--LightGBM, XGBoost, and CatBoost are combined using a VotingRegressor, which averages the predictions of each model.
+# 4 How we optimized the models
+a. Hyperparameter Tuning
+- For models like LightGBM, XGBoost, and CatBoost, we tuned hyperparameters to enhance model performance.
+- This fine-tuning helped reduce overfitting and improved the balance between bias and variance.
 
-5.Model Evaluation using K-Fold Cross-Validation:
--StratifiedKFold is used to split the data into training and validation sets, ensuring that the class distribution is maintained in each fold.
+b. Cross-Validation (K-Fold)
+- We implemented Stratified K-Fold Cross-Validation to ensure each fold had a proportional representation of each class.
+- This technique maximized the use of data, ensuring the model was trained and validated on different portions, reducing the risk of overfitting to a single subset.
+
+c. Ensemble Learning
+- By combining predictions from LightGBM, XGBoost, CatBoost, and MLP models, we created an ensemble model that leveraged the strengths of each algorithm.
+- This ensemble approach improved overall accuracy and robustness.
+
+d. Feature Engineering and Selection
+- We filtered out unnecessary features and focused on those that had the most predictive power.
+- Categorical features were mapped to numerical values, and time-related data was merged to provide more context.
+
+e. Threshold Optimization
+- After initial predictions, we applied threshold tuning using techniques like the Nelder-Mead optimization method.
+- This step helped adjust classification boundaries to improve metrics like the Quadratic Weighted Kappa (QWK) score.
+
+f. Handling Missing Data
+- Records with missing values in the target variable (SII) were removed to ensure data integrity.
+- For categorical features, missing values were handled systematically to prevent biases during training.
+

@@ -1,5 +1,11 @@
 # MachineLearning
 
+We are KM group of the machine learning class INT3405E 56. 
+Our members:
+- Hoàng Đức Minh (22028051)
+- Trần Trọng Thịnh (22028073)
+- Nguyễn Đức Kiên (22028285)
+
 What the code does:
 
 1.Data Handling:
